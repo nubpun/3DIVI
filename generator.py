@@ -1,12 +1,9 @@
-
 # coding: utf-8
 # TODO-me remove external library
 import random
 import math
 import matplotlib.pyplot as plt
 import sys
-
-# In[332]:
 
 
 class Point:
@@ -45,12 +42,11 @@ def checkTriangle(points):
     return True
 
 
-# In[335]:
-
 def drawPoint(pic, x, y, alfa):
     pic[x][y] = int(alfa * 255);
 
-def WuLine(pic, A, B):
+
+def wuLine(pic, A, B):
     x0 = A.x; y0 = A.y
     x1 = B.x; y1 = B.y
     
@@ -79,18 +75,21 @@ def WuLine(pic, A, B):
 
 
 # Инициализация всех параметров.
-pic = []
-N = 500
-M = 500
-DIST = 100
+# TODO-me включить release
+DEBUG = 123
+RELEASE = 124
+filename = 'image.pgm'
+N = 50
+M = 50
+MODE = DEBUG
+DIST = 10
 ANGLE_deg = 30
 ANGLE_rad = math.radians(ANGLE_deg)
-STD_P = 0.01
+STD_P = 0.1
+pic = []
 for x in range(N):
     pic.append([0] * M)
 
-
-# In[343]:
 # Найдем три точки, удовлетворяющие условию
 points = []
 while True:
@@ -100,7 +99,6 @@ while True:
         points.append(t)
     if checkTriangle(points):
         break
-# print(points[0], points[1], points[2], sep='\n')
 # закрасим найденные точки.
 pic[points[0].x][points[0].y] = 255
 pic[points[1].x][points[1].y] = 255
@@ -124,12 +122,11 @@ for i in range(N):
 
 
 # Проведем стороны треугольника.
-WuLine(pic, points[0], points[1])
-WuLine(pic, points[0], points[2])
-WuLine(pic, points[1], points[2])
+wuLine(pic, points[0], points[1])
+wuLine(pic, points[0], points[2])
+wuLine(pic, points[1], points[2])
 
 # Сохрание в файл
-filename = 'image.pgm'
 fout = open(filename, 'w')
 pgmHeader = 'P2' + '\n' + str(N) + '  ' + str(M) + '  ' + str(255) + '\n'
 
@@ -140,12 +137,15 @@ for i in range(N):
     fout.write('\n')
 fout.close()
 
-cnt = 0
-for i in range(N):
-    for j in range(M):
-        if pic[i][j] == 255:
-            cnt += 1
-print(cnt)
+
+# Количество потенциальных вершин треугольника после зашумления.
+if MODE == DEBUG:
+    cnt = 0
+    for i in range(N):
+        for j in range(M):
+            if pic[i][j] == 255:
+                cnt += 1
+    print(cnt)
 
 
 

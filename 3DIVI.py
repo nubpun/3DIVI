@@ -1,0 +1,157 @@
+
+# coding: utf-8
+# TODO-me remove external library
+import random
+import math
+import matplotlib.pyplot as plt
+import sys
+
+# In[332]:
+
+
+class Point:
+
+    def __init__(self, x, y):
+        self.y = y
+        self.x = x      
+
+    def __str__(self):
+        return str(self.x) + ' ' + str(self.y)
+    
+    @staticmethod
+    def make_vector(a, b):
+        return Point(b.x - a.x, b.y - a.y)
+
+
+def angle(a, b):
+    return math.fabs(math.atan2(a.x * b.y - a.y * b.x, (a.x * b.x + a.y * b.y)))
+
+
+def dist(A, B):
+    return math.hypot(A.x - B.x, A.y - B.y)
+
+
+def checkTriangle(points):
+    a = points[0]
+    b = points[1]
+    c = points[2]
+    vector_a=Point.make_vector(a, b)
+    vector_b=Point.make_vector(a, c)
+    vector_c=Point.make_vector(c, b)
+    if dist(a, b) < DIST or dist(a, c) < DIST or dist(b, c) < DIST:
+        return False
+    if angle(vector_a, vector_b) < ANGLE_rad or angle(vector_a, vector_c) < ANGLE_rad or angle(vector_c, vector_b) < ANGLE_rad:
+        return False
+    return True
+
+
+# In[335]:
+
+def drawPoint(pic, x, y, alfa):
+    pic[x][y] = int(alfa * 255);
+
+def WuLine(pic, A, B):
+    x0 = A.x; y0 = A.y
+    x1 = B.x; y1 = B.y
+    
+    drawPoint(pic, x0, y0, 1) 
+    drawPoint(pic, x1, y1, 1) 
+    
+    steep = math.fabs(y1 - y0) > math.fabs(x1 - x0)
+    if steep:
+        x0, y0 = y0, x0
+        x1, y1 = y1, x1
+    if x0 > x1:
+        x0, x1 = x1, x0
+        y0, y1 = y1, y0
+    dx = x1 - x0;
+    dy = y1 - y0;
+    gradient = dy / dx
+    y = y0 + gradient
+    for x in range(x0 + 1, x1):
+        if steep:            
+            drawPoint(pic, int(y), x, 1 - (y - int(y)))
+            drawPoint(pic, int(y) + 1, x, y - int(y))
+        else:
+            drawPoint(pic, x, int(y), 1 - (y - int(y)))
+            drawPoint(pic, x, int(y) + 1, y - int(y))
+        y += gradient
+
+
+# Инициализация всех параметров.
+pic = []
+N = 500
+M = 500
+DIST = 100
+ANGLE_deg = 30
+ANGLE_rad = math.radians(ANGLE_deg)
+STD_P = 0.01
+for x in range(N):
+    pic.append([0] * M)
+
+
+# In[343]:
+# Найдем три точки, удовлетворяющие условию
+points = []
+while True:
+    points = []
+    for i in range(3):
+        t = Point(random.randint(0, N - 1), random.randint(0, N - 1))
+        points.append(t)
+    if checkTriangle(points):
+        break
+# print(points[0], points[1], points[2], sep='\n')
+# закрасим найденные точки.
+pic[points[0].x][points[0].y] = 255
+pic[points[1].x][points[1].y] = 255
+pic[points[2].x][points[2].y] = 255
+
+
+# Рисование треугольника, отладка.
+# plt.imshow(pic)
+# plt.show()
+
+
+# Зашумление.
+try:
+    P = float(sys.argv[1])
+except IndexError:
+    P = STD_P
+for i in range(N):
+    for j in range(M):
+        if random.random() <= P:
+            pic[i][j] = random.randint(0, 255)
+
+
+# Проведем стороны треугольника.
+WuLine(pic, points[0], points[1])
+WuLine(pic, points[0], points[2])
+WuLine(pic, points[1], points[2])
+
+# Сохрание в файл
+filename = 'image.pgm'
+fout = open(filename, 'w')
+pgmHeader = 'P2' + '\n' + str(N) + '  ' + str(M) + '  ' + str(255) + '\n'
+
+fout.write(pgmHeader)
+for i in range(N):
+    for j in range(M):
+        fout.write(str(pic[i][j]) + ' ')
+    fout.write('\n')
+fout.close()
+
+cnt = 0
+for i in range(N):
+    for j in range(M):
+        if pic[i][j] == 255:
+            cnt += 1
+print(cnt)
+
+
+
+
+
+
+
+
+

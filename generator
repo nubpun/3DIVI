@@ -79,13 +79,13 @@ def wuLine(pic, A, B):
 DEBUG = 123
 RELEASE = 124
 filename = 'image.pgm'
-N = 50
-M = 50
+N = 500
+M = 500
 MODE = DEBUG
 DIST = 10
 ANGLE_deg = 30
 ANGLE_rad = math.radians(ANGLE_deg)
-STD_P = 0.1
+STD_P = 0.5
 pic = []
 for x in range(N):
     pic.append([0] * M)
